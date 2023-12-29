@@ -1,0 +1,49 @@
+version: '3.8'  
+
+services:
+  cassandra1:
+    image: cassandra:latest
+    container_name: cassandra1
+    ports:
+      - "9042:9042"
+    networks:
+      - cassan_cluster_network
+    volumes:
+      - ./data/cass1:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=test
+      - CASSANDRA_SEEDS=cassandra1,cassandra2,cassandra3
+
+  cassandra2:
+    image: cassandra:latest
+    container_name: cassandra2
+    networks:
+      - cassan_cluster_network
+    volumes:
+      - ./data/cass2:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=test
+      - CASSANDRA_SEEDS=cassandra1,cassandra2,cassandra3
+
+  cassandra3:
+    image: cassandra:latest
+    container_name: cassandra3
+    networks:
+      - cassan_cluster_network
+    volumes:
+      - ./data/cass3:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=test
+      - CASSANDRA_SEEDS=cassandra1,cassandra2,cassandra3
+  
+  client:
+    image: python:3.8.10
+    container_name: client_python
+    tty: true
+    networks:
+      - cassan_cluster_network
+    volumes:
+      - ./code/:/code
+networks:
+  cassan_cluster_network:
+    driver: bridge
